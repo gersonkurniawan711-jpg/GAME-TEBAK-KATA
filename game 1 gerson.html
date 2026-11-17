@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Tebak Kata</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+h1 {
+    color: #6546c7;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.kata {
+    background: #eeeaff;
+    padding: 25px 10px;
+    border-radius: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 6px;
+    color: #6546c7;
+    margin: 20px 0;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 17px;
+    text-align: center;
+    outline: none;
+}
+
+input:focus {
+    border-color: #6546c7;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #6546c7;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4d32a5;
+}
+
+.petunjuk {
+    background: #ffb547;
+    color: #333;
+}
+
+#pesan {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎮 Tebak Kata</h1>
+    <p>Susun huruf berikut menjadi kata yang benar!</p>
+
+    <div class="info">
+        <span>⭐ Skor: <span id="skor">0</span></span>
+        <span>❤️ Kesempatan: <span id="nyawa">3</span></span>
+    </div>
+
+    <div class="kata" id="kata">BUKU</div>
+
+    <p id="petunjuk">Petunjuk: Alat untuk membaca</p>
+
+    <input
+        type="text"
+        id="jawaban"
+        placeholder="Masukkan jawaban..."
+        autocomplete="off"
+    >
+
+    <button onclick="cekJawaban()">Periksa Jawaban</button>
+
+    <button class="petunjuk" onclick="lihatPetunjuk()">
+        💡 Lihat Petunjuk
+    </button>
+
+    <button onclick="soalBerikutnya()">
+        Soal Berikutnya ➜
+    </button>
+
+    <p id="pesan"></p>
+
+</div>
+
+<script>
+
+const daftarKata = [
+    {kata: "BUKU", acak: "UKUB", petunjuk: "Alat untuk membaca"},
+    {kata: "MEJA", acak: "AJEM", petunjuk: "Tempat meletakkan barang"},
+    {kata: "PISANG", acak: "GANSIP", petunjuk: "Buah berwarna kuning"},
+    {kata: "SEKOLAH", acak: "LAHOKES", petunjuk: "Tempat belajar"},
+    {kata: "KOMPUTER", acak: "PUTERKOM", petunjuk: "Alat elektronik untuk bekerja"},
+    {kata: "KUCING", acak: "GINKUC", petunjuk: "Hewan yang suka mengeong"},
+    {kata: "MATAHARI", acak: "HARAMAITA", petunjuk: "Benda langit yang bersinar"},
+    {kata: "JENDELA", acak: "DAJELEN", petunjuk: "Tempat masuknya cahaya"}
+];
+
+let nomor = 0;
+let skor = 0;
+let nyawa = 3;
+let sudahBenar = false;
+
+function tampilkanSoal() {
+    const soal = daftarKata[nomor];
+
+    document.getElementById("kata").textContent = soal.acak;
+    document.getElementById("petunjuk").textContent =
+        "Petunjuk: " + soal.petunjuk;
+
+    document.getElementById("jawaban").value = "";
+    document.getElementById("pesan").textContent = "";
+    document.getElementById("skor").textContent = skor;
+    document.getElementById("nyawa").textContent = nyawa;
+
+    sudahBenar = false;
+}
+
+function cekJawaban() {
+    const input = document.getElementById("jawaban")
+        .value.trim().toUpperCase();
+
+    const pesan = document.getElementById("pesan");
+
+    if (sudahBenar) {
+        pesan.textContent = "Klik soal berikutnya!";
+        return;
+    }
+
+    if (nyawa <= 0) {
+        pesan.textContent = "Kesempatan habis! Klik soal berikutnya.";
+        return;
+    }
+
+    if (input === "") {
+        pesan.textContent = "Masukkan jawaban terlebih dahulu!";
+        return;
+    }
+
+    if (input === daftarKata[nomor].kata) {
+        skor += 10;
+        sudahBenar = true;
+        pesan.style.color = "green";
+        pesan.textContent = "🎉 Benar! Kamu mendapatkan 10 poin!";
+        document.getElementById("skor").textContent = skor;
+    } else {
+        nyawa--;
+        document.getElementById("nyawa").textContent = nyawa;
+        pesan.style.color = "red";
+
+        if (nyawa > 0) {
+            pesan.textContent = "❌ Salah! Coba lagi.";
+        } else {
+            pesan.textContent = "Kesempatan habis! Jawabannya: " +
+                daftarKata[nomor].kata;
+        }
+    }
+}
+
+function lihatPetunjuk() {
+    document.getElementById("petunjuk").textContent =
+        "💡 " + daftarKata[nomor].petunjuk;
+}
+
+function soalBerikutnya() {
+    nomor++;
+
+    if (nomor >= daftarKata.length) {
+        alert("🏆 Game selesai!\nSkor akhir kamu: " + skor);
+
+        nomor = 0;
+        skor = 0;
+        nyawa = 3;
+    } else {
+        nyawa = 3;
+    }
+
+    tampilkanSoal();
+}
+
+document.getElementById("jawaban").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        cekJawaban();
+    }
+});
+
+tampilkanSoal();
+
+</script>
+
+</body>
+</html>
